@@ -5,8 +5,8 @@ import os
 from flask_migrate import Migrate
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key_here'  # Ganti dengan kunci unik dan rahasia
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'  # Menambahkan URI database
+app.secret_key = os.environ.get('SECRET_KEY', 'your_secret_key_here')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///users.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)  # Inisialisasi SQLAlchemy
 
@@ -176,8 +176,7 @@ def admin_dashboard():
 
 if __name__ == "__main__":
     with app.app_context():
-        db.drop_all()  # Hati-hati, ini akan menghapus semua tabel
-        db.create_all()  # Membuat ulang semua tabel
-    app.run(debug=True)
-    port = int(os.environ.get('PORT', 5000))
-    app.run(debug=False, host='0.0.0.0', port=port)
+        db.create_all()  # Membuat tabel jika belum ada
+    
+    port = int(os.environ.get('PORT', 8080))  # Ubah default port ke 8080
+    app.run(host='0.0.0.0', port=port)  # Hapus debug mode untuk production
